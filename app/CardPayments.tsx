@@ -14,9 +14,10 @@ import { Label } from "@/components/ui/label";
 import {
   createIntent,
   generateToken,
+  makePaymentMOTO,
   testPaymentForm,
 } from "@/lib/actions/blink";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Head from "next/head";
 import test from "node:test";
 function CardPayments() {
@@ -25,7 +26,7 @@ function CardPayments() {
   const [type, setType] = useState("SALE");
   const [layout, setLayout] = useState("basic");
   const [delay, setDelay] = useState(0);
-
+  const formRef = useRef(null);
   const [intent, setIntent] = useState(null);
 
   return (
@@ -106,7 +107,17 @@ function CardPayments() {
         </form>
       )}
       {intent && (
-        <form method="POST" id="payment" onSubmit={() => {}}>
+        <form
+          ref={formRef}
+          method="POST"
+          id="payment"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(formRef.current);
+            const paymentData = Object.fromEntries(formData.entries());
+            makePaymentMOTO(data.access_token, paymentData);
+          }}
+        >
           <div
             dangerouslySetInnerHTML={{ __html: intent?.element.ccMotoElement }}
           />

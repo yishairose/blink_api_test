@@ -77,48 +77,32 @@ export const createIntent = async (
   }
 };
 
-export const makePaymentMOTO = async (
-  accessToken: string,
-  {
-    payment_intent,
-    paymentToken,
-    type,
-    customer_email,
-    customer_name,
-    transaction_unique,
-  }: {
-    payment_intent: string;
-    paymentToken: string;
-    type: number;
-    customer_email: string;
-    customer_name: string;
-    transaction_unique: string;
-  }
-) => {
-  const reqBody = {
-    accessToken,
-    payment_intent,
-    paymentToken,
-    type,
-    customer_email,
-    customer_name,
-    transaction_unique,
-  };
+export const makePaymentMOTO = async (accessToken: string, data) => {
+  console.log(data);
+  //   const reqBody = {
+  //     accessToken,
+  //     payment_intent,
+  //     paymentToken,
+  //     type,
+  //     customer_email,
+  //     customer_name,
+  //     transaction_unique,
+  //   };
 
-  try {
-    const response = await fetch(`${URL}/creditcards`, {
-      method: "POST",
-      body: JSON.stringify(reqBody),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    const data = await response.json();
-    console.log(data);
-    return data;
-  } catch (error) {
-    if (error instanceof Error) return error?.message;
-    return error;
-  }
+  //   try {
+  //     const response = await fetch(`${URL}/creditcards`, {
+  //       method: "POST",
+  //       body: JSON.stringify(reqBody),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     });
+  //     const data = await response.json();
+  //     console.log(data);
+  //     return data;
+  //   } catch (error) {
+  //     if (error instanceof Error) return error?.message;
+  //     return error;
+  //   }
 };
