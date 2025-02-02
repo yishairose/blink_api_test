@@ -13,27 +13,17 @@ import { Label } from "@/components/ui/label";
 import {
   createIntent,
   generateToken,
-  makePaymentMOTO,
-  processPayment,
+  makePaymentEcom,
 } from "@/lib/actions/blink";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { useEffect, useRef, useState } from "react";
-import Head from "next/head";
 
-function CardPayments() {
+import { useEffect, useRef, useState } from "react";
+
+function CardPaymentsEcom() {
   const [data, setData] = useState<null | any>(null);
   const [amount, setAmount] = useState(0);
   const [type, setType] = useState("SALE");
   const [layout, setLayout] = useState("basic");
   const [delay, setDelay] = useState(0);
-  const formRef = useRef(null);
   const [intent, setIntent] = useState(null);
 
   useEffect(() => {
@@ -43,32 +33,39 @@ function CardPayments() {
     }
     if (!data) initiatePaymentProcess();
   }, [data]);
+
   return (
     <>
-      <h1 className="text-2xl">Card Payment flow MONO</h1>
+      <h1 className="text-2xl">Card Payment flow Ecom</h1>
+      {intent?.id ? (
+        <>
+          <form id="payment" action={makePaymentEcom}>
+            {data && (
+              <input
+                type="hidden"
+                name="accessToken"
+                value={data.access_token}
+              />
+            )}
 
-      <form
-        id="payment"
-        action={makePaymentMOTO}
-        className={`${intent ? "block" : "hidden"}`}
-      >
-        {data && (
-          <input type="hidden" name="accessToken" value={data.access_token} />
-        )}
-        {intent && (
-          <>
             <div
               dangerouslySetInnerHTML={{
-                __html: intent?.element.ccMotoElement,
+                __html: intent?.element.ccElement,
               }}
             />
+
             <Button type="submit">Pay</Button>
             <Script src="https://secure.blinkpayment.co.uk/assets/js/api/custom.js"></Script>
-          </>
-        )}
-      </form>
-
-      {data && (
+          </form>
+          <Script src="https://gateway2.blinkpayment.co.uk/sdk/web/v1/js/hostedfields.min.js"></Script>
+        </>
+      ) : (
+        <div className="text-red-500 w-full text-center">
+          <div>{intent?.message}</div>
+          <div>{intent?.data?.amount[0]}</div>
+        </div>
+      )}
+      {data && !intent && (
         <form className="flex flex-col gap-4 items-start ">
           <h3 className="text-xl font-bold">Create Intent</h3>
           <div className="w-[180px]">
@@ -135,9 +132,8 @@ function CardPayments() {
         </form>
       )}
       <Script src="https://code.jquery.com/jquery-3.6.3.min.js"></Script>
-      <Script src="https://gateway2.blinkpayment.co.uk/sdk/web/v1/js/hostedfields.min.js"></Script>
     </>
   );
 }
 
-export default CardPayments;
+export default CardPaymentsEcom;

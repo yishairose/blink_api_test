@@ -118,3 +118,7 @@ export const makePaymentMOTO = async (data: FormData) => {
     return error;
   }
 };
+
+export const makePaymentEcom = async (data: FormData) => {
+  console.log(data);
+};
