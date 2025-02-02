@@ -1,6 +1,5 @@
 "use client";
 import Script from "next/script";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,13 +14,21 @@ import {
   createIntent,
   generateToken,
   makePaymentMOTO,
-  testPaymentForm,
+  processPayment,
 } from "@/lib/actions/blink";
-import { useRef, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
-import test from "node:test";
+
 function CardPayments() {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<null | any>(null);
   const [amount, setAmount] = useState(0);
   const [type, setType] = useState("SALE");
   const [layout, setLayout] = useState("basic");
@@ -29,18 +36,38 @@ function CardPayments() {
   const formRef = useRef(null);
   const [intent, setIntent] = useState(null);
 
+  useEffect(() => {
+    async function initiatePaymentProcess() {
+      const data = await generateToken();
+      setData(data);
+    }
+    if (!data) initiatePaymentProcess();
+  }, [data]);
   return (
     <>
       <h1 className="text-2xl">Card Payment flow MONO</h1>
-      <Button
-        onClick={async () => {
-          const data = await generateToken();
-          setData(data);
-        }}
-        className="self-start"
+
+      <form
+        id="payment"
+        action={makePaymentMOTO}
+        className={`${intent ? "block" : "hidden"}`}
       >
-        Start Payment
-      </Button>
+        {data && (
+          <input type="hidden" name="accessToken" value={data.access_token} />
+        )}
+        {intent && (
+          <>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: intent?.element.ccMotoElement,
+              }}
+            />
+            <Button type="submit">Pay</Button>
+            <Script src="https://secure.blinkpayment.co.uk/assets/js/api/custom.js"></Script>
+          </>
+        )}
+      </form>
+
       {data && (
         <form className="flex flex-col gap-4 items-start ">
           <h3 className="text-xl font-bold">Create Intent</h3>
@@ -88,6 +115,7 @@ function CardPayments() {
               onChange={(e) => setDelay(Number(e.target.value))}
             />
           </div>
+
           <Button
             onClick={async (e) => {
               e.preventDefault();
@@ -106,27 +134,8 @@ function CardPayments() {
           </Button>
         </form>
       )}
-      {intent && (
-        <form
-          ref={formRef}
-          method="POST"
-          id="payment"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const formData = new FormData(formRef.current);
-            const paymentData = Object.fromEntries(formData.entries());
-            makePaymentMOTO(data.access_token, paymentData);
-          }}
-        >
-          <div
-            dangerouslySetInnerHTML={{ __html: intent?.element.ccMotoElement }}
-          />
-          <Button type="submit">Pay</Button>
-        </form>
-      )}
-      <Script src="https://code.jquery.com/jquery-3.6.3.min.js" />
-      <Script src="https://gateway2.blinkpayment.co.uk/sdk/web/v1/js/hostedfields.min.js" />
-      <Script src="https://secure.blinkpayment.co.uk/assets/js/api/custom.js" />
+      <Script src="https://code.jquery.com/jquery-3.6.3.min.js"></Script>
+      <Script src="https://gateway2.blinkpayment.co.uk/sdk/web/v1/js/hostedfields.min.js"></Script>
     </>
   );
 }
