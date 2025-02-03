@@ -16,8 +16,7 @@ import {
   makePaymentMOTO,
 } from "@/lib/actions/blink";
 
-import { Fragment, useEffect, useState } from "react";
-import { revalidatePath } from "next/cache";
+import { Fragment, useEffect, useRef, useState } from "react";
 
 function CardPaymentsMono() {
   const [data, setData] = useState<null | any>(null);
@@ -27,6 +26,32 @@ function CardPaymentsMono() {
   const [layout, setLayout] = useState("basic");
   const [delay, setDelay] = useState(0);
   const [intent, setIntent] = useState(null);
+  const formRef = useRef(null);
+  // const [isFormLoaded, setIsFormLoaded] = useState(false);
+
+  // useEffect(() => {
+  //   console.log("Form ref", formRef.current);
+  //   if (formRef.current) {
+  //     setIsFormLoaded(true);
+  //     console.log("Form loaded");
+  //     // Load external script dynamically
+  //     const script1 = document.createElement("script");
+  //     script1.src =
+  //       "https://gateway2.blinkpayment.co.uk/sdk/web/v1/js/hostedfields.min.js";
+  //     script1.async = true;
+  //     document.body.appendChild(script1);
+  //     const script2 = document.createElement("script");
+  //     script2.src = "https://secure.blinkpayment.co.uk/assets/js/api/custom.js";
+  //     script2.async = true;
+  //     document.body.appendChild(script2);
+
+  //     return () => {
+  //       document.body.removeChild(script1);
+  //       document.body.removeChild(script2);
+  //       console.log("Script removed when form is unmounted");
+  //     };
+  //   }
+  // }, [intent]);
 
   useEffect(() => {
     async function initiatePaymentProcess() {
@@ -52,8 +77,8 @@ function CardPaymentsMono() {
         </div>
       )}
       {intent?.id ? (
-        <div>
-          <form id="payment" action={makePaymentMOTO}>
+        <>
+          <form id="payment" action={makePaymentMOTO} ref={formRef}>
             {data && (
               <input
                 type="hidden"
@@ -69,18 +94,19 @@ function CardPaymentsMono() {
             />
 
             <Button type="submit">Pay</Button>
-            <Script
-              key={"mono"}
-              id="custom"
-              src="https://secure.blinkpayment.co.uk/assets/js/api/custom.js"
-            ></Script>
           </form>
-          <Script
-            key={"mono"}
+
+          <script
+            async
             id="blink-hosted-fields"
             src="https://gateway2.blinkpayment.co.uk/sdk/web/v1/js/hostedfields.min.js"
-          ></Script>
-        </div>
+          ></script>
+          <script
+            async
+            id="custom"
+            src="https://secure.blinkpayment.co.uk/assets/js/api/custom.js"
+          ></script>
+        </>
       ) : (
         <div className="text-red-500 w-full text-center">
           <div>{intent?.message}</div>

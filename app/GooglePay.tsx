@@ -13,7 +13,6 @@ import { Label } from "@/components/ui/label";
 import {
   createIntent,
   generateToken,
-  makePaymentEcom,
   makePaymentGpay,
 } from "@/lib/actions/blink";
 
@@ -57,9 +56,8 @@ function GooglePay() {
             />
 
             <Button type="submit">Pay</Button>
-            <Script src="https://secure.blinkpayment.co.uk/assets/js/api/custom.js"></Script>
           </form>
-          <Script src="https://gateway2.blinkpayment.co.uk/sdk/web/v1/js/hostedfields.min.js"></Script>
+
           <form action={makePaymentGpay} id="gpPayment">
             <div
               dangerouslySetInnerHTML={{
@@ -67,6 +65,16 @@ function GooglePay() {
               }}
             />
           </form>
+          <script
+            async
+            id="blink-hosted-fields"
+            src="https://gateway2.blinkpayment.co.uk/sdk/web/v1/js/hostedfields.min.js"
+          ></script>
+          <script
+            async
+            id="custom"
+            src="https://secure.blinkpayment.co.uk/assets/js/api/custom.js"
+          ></script>
         </div>
       ) : (
         <div className="text-red-500 w-full text-center">

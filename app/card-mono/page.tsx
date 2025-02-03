@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
-import CardPayments from "../CardPaymentsMono";
+
 import Link from "next/link";
+import CardPaymentsMono from "../CardPaymentsMono";
 
 function page() {
   return (
@@ -10,7 +11,7 @@ function page() {
           Home
         </Link>
       </Button>
-      <CardPayments />
+      <CardPaymentsMono />
     </div>
   );
 }
