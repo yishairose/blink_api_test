@@ -16,7 +16,7 @@ import {
   makePaymentEcom,
 } from "@/lib/actions/blink";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 
 function CardPaymentsEcom() {
   const [data, setData] = useState<null | any>(null);
@@ -25,6 +25,7 @@ function CardPaymentsEcom() {
   const [layout, setLayout] = useState("basic");
   const [delay, setDelay] = useState(0);
   const [intent, setIntent] = useState(null);
+  const paymentFormRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     async function initiatePaymentProcess() {
@@ -34,12 +35,25 @@ function CardPaymentsEcom() {
     if (!data) initiatePaymentProcess();
   }, [data]);
 
+  function handleSubmit(e) {
+    e.preventDefault();
+    const formData = new FormData(paymentFormRef.current);
+    const formDataObject = Object.fromEntries(formData.entries());
+    makePaymentEcom(formDataObject);
+  }
+
   return (
     <>
       <h1 className="text-2xl">Card Payment flow Ecom</h1>
+
       {intent?.id ? (
-        <div>
-          <form id="payment" action={makePaymentEcom}>
+        <>
+          <form
+            id="payment"
+            onSubmit={handleSubmit}
+            ref={paymentFormRef}
+            method="POST"
+          >
             {data && (
               <input
                 type="hidden"
@@ -66,7 +80,7 @@ function CardPaymentsEcom() {
             id="custom"
             src="https://secure.blinkpayment.co.uk/assets/js/api/custom.js"
           ></script>
-        </div>
+        </>
       ) : (
         <div className="text-red-500 w-full text-center">
           <div>{intent?.message}</div>

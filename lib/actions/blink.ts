@@ -81,46 +81,47 @@ export const createIntent = async (
 };
 
 export const makePaymentMOTO = async (data: FormData) => {
-  const access_token = data.get("access_token");
-  const payment_intent = data.get("payment_intent");
-  const paymentToken = data.get("paymentToken");
-  const type = data.get("type");
-  const customer_email = data.get("customer_email");
-  const customer_name = data.get("customer_name");
-  const customer_address = data.get("customer_address");
-  const customer_postcode = data.get("customer_postcode");
-  const transaction_unique = data.get("transaction_unique");
+  console.log(data);
+  // const access_token = data.get("access_token");
+  // const payment_intent = data.get("payment_intent");
+  // const paymentToken = data.get("paymentToken");
+  // const type = data.get("type");
+  // const customer_email = data.get("customer_email");
+  // const customer_name = data.get("customer_name");
+  // const customer_address = data.get("customer_address");
+  // const customer_postcode = data.get("customer_postcode");
+  // const transaction_unique = data.get("transaction_unique");
 
-  const body = {
-    payment_intent,
-    paymentToken,
-    type,
-    customer_email,
-    customer_name,
-    customer_address,
-    customer_postcode,
-    transaction_unique,
-  };
+  // const body = {
+  //   payment_intent,
+  //   paymentToken,
+  //   type,
+  //   customer_email,
+  //   customer_name,
+  //   customer_address,
+  //   customer_postcode,
+  //   transaction_unique,
+  // };
 
-  try {
-    const response = await fetch(`${URL}/creditcards`, {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`,
-      },
-    });
-    const data = await response.json();
-    console.log(data);
-    return data;
-  } catch (error) {
-    if (error instanceof Error) return error?.message;
-    return error;
-  }
+  // try {
+  //   const response = await fetch(`${URL}/creditcards`, {
+  //     method: "POST",
+  //     body: JSON.stringify(body),
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: `Bearer ${access_token}`,
+  //     },
+  //   });
+  //   const data = await response.json();
+  //   console.log(data);
+  //   return data;
+  // } catch (error) {
+  //   if (error instanceof Error) return error?.message;
+  //   return error;
+  // }
 };
 
-export const makePaymentEcom = async (data: FormData) => {
+export const makePaymentEcom = async (data) => {
   console.log(data);
 };
 export const makePaymentGpay = async (data: FormData) => {

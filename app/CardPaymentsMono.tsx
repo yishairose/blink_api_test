@@ -26,7 +26,8 @@ function CardPaymentsMono() {
   const [layout, setLayout] = useState("basic");
   const [delay, setDelay] = useState(0);
   const [intent, setIntent] = useState(null);
-  const formRef = useRef(null);
+  const paymentFormRef = useRef<HTMLFormElement>(null);
+
   // const [isFormLoaded, setIsFormLoaded] = useState(false);
 
   // useEffect(() => {
@@ -68,6 +69,13 @@ function CardPaymentsMono() {
     if (!data) initiatePaymentProcess();
   }, [data]);
 
+  function handleSubmit(e) {
+    e.preventDefault();
+    const formData = new FormData(paymentFormRef.current);
+    const formDataObject = Object.fromEntries(formData.entries());
+    makePaymentMOTO(formDataObject);
+  }
+
   return (
     <>
       <h1 className="text-2xl">Card Payment flow MONO</h1>
@@ -78,7 +86,12 @@ function CardPaymentsMono() {
       )}
       {intent?.id ? (
         <>
-          <form id="payment" action={makePaymentMOTO} ref={formRef}>
+          <form
+            id="payment"
+            onSubmit={handleSubmit}
+            ref={paymentFormRef}
+            method="POST"
+          >
             {data && (
               <input
                 type="hidden"

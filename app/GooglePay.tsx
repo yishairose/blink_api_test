@@ -16,7 +16,7 @@ import {
   makePaymentGpay,
 } from "@/lib/actions/blink";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import Head from "next/head";
 
 function GooglePay() {
@@ -26,6 +26,7 @@ function GooglePay() {
   const [layout, setLayout] = useState("basic");
   const [delay, setDelay] = useState(0);
   const [intent, setIntent] = useState(null);
+  const paymentFormRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     async function initiatePaymentProcess() {
@@ -34,13 +35,24 @@ function GooglePay() {
     }
     if (!data) initiatePaymentProcess();
   }, [data]);
+  function handleSubmit(e) {
+    e.preventDefault();
+    const formData = new FormData(paymentFormRef.current);
+    const formDataObject = Object.fromEntries(formData.entries());
+    makePaymentGpay(formDataObject);
+  }
 
   return (
     <>
       <h1 className="text-2xl">Card Payment flow Google Pay</h1>
       {intent?.id ? (
         <div>
-          <form id="payment" action={makePaymentGpay}>
+          <form
+            id="payment"
+            onSubmit={handleSubmit}
+            ref={paymentFormRef}
+            method="POST"
+          >
             {data && (
               <input
                 type="hidden"
