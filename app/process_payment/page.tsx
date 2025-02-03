@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import PaymentForm from "../PaymentForm";
+import PaymentForm from "./PaymentForm";
 import { makePaymentMOTO } from "@/lib/actions/blink";
 import { Button } from "@/components/ui/button";
 import Script from "next/script";

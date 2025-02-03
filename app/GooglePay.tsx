@@ -13,15 +13,15 @@ import { Label } from "@/components/ui/label";
 import {
   createIntent,
   generateToken,
-  makePaymentMOTO,
+  makePaymentEcom,
+  makePaymentGpay,
 } from "@/lib/actions/blink";
 
 import { Fragment, useEffect, useState } from "react";
-import { revalidatePath } from "next/cache";
+import Head from "next/head";
 
-function CardPaymentsMono() {
+function GooglePay() {
   const [data, setData] = useState<null | any>(null);
-  const [error, setError] = useState<null | string>(null);
   const [amount, setAmount] = useState(0);
   const [type, setType] = useState("SALE");
   const [layout, setLayout] = useState("basic");
@@ -30,30 +30,18 @@ function CardPaymentsMono() {
 
   useEffect(() => {
     async function initiatePaymentProcess() {
-      try {
-        const data = await generateToken();
-        if (!data.success) throw new Error(data.error);
-        console.log(data);
-        setData(data);
-      } catch (error) {
-        setError(error.message);
-        console.log(error);
-      }
+      const data = await generateToken();
+      setData(data);
     }
     if (!data) initiatePaymentProcess();
   }, [data]);
 
   return (
     <>
-      <h1 className="text-2xl">Card Payment flow MONO</h1>
-      {error && (
-        <div className="text-red-500 w-full text-center">
-          <div>{error}</div>
-        </div>
-      )}
+      <h1 className="text-2xl">Card Payment flow Google Pay</h1>
       {intent?.id ? (
         <div>
-          <form id="payment" action={makePaymentMOTO}>
+          <form id="payment" action={makePaymentGpay}>
             {data && (
               <input
                 type="hidden"
@@ -64,22 +52,21 @@ function CardPaymentsMono() {
 
             <div
               dangerouslySetInnerHTML={{
-                __html: intent?.element.ccMotoElement,
+                __html: intent?.element.ccElement,
               }}
             />
 
             <Button type="submit">Pay</Button>
-            <Script
-              key={"mono"}
-              id="custom"
-              src="https://secure.blinkpayment.co.uk/assets/js/api/custom.js"
-            ></Script>
+            <Script src="https://secure.blinkpayment.co.uk/assets/js/api/custom.js"></Script>
           </form>
-          <Script
-            key={"mono"}
-            id="blink-hosted-fields"
-            src="https://gateway2.blinkpayment.co.uk/sdk/web/v1/js/hostedfields.min.js"
-          ></Script>
+          <Script src="https://gateway2.blinkpayment.co.uk/sdk/web/v1/js/hostedfields.min.js"></Script>
+          <form action={makePaymentGpay} id="gpPayment">
+            <div
+              dangerouslySetInnerHTML={{
+                __html: intent?.element.gpElement,
+              }}
+            />
+          </form>
         </div>
       ) : (
         <div className="text-red-500 w-full text-center">
@@ -87,7 +74,7 @@ function CardPaymentsMono() {
           <div>{intent?.data?.amount[0]}</div>
         </div>
       )}
-      {data?.success && !intent && (
+      {data && !intent && (
         <form className="flex flex-col gap-4 items-start ">
           <h3 className="text-xl font-bold">Create Intent</h3>
           <div className="w-[180px]">
@@ -146,17 +133,15 @@ function CardPaymentsMono() {
                 delay_capture_days: delay,
               });
               if (intent) setIntent(intent);
-              console.log(intent);
             }}
           >
             Create Intent
           </Button>
         </form>
       )}
-
       <Script src="https://code.jquery.com/jquery-3.6.3.min.js"></Script>
     </>
   );
 }
 
-export default CardPaymentsMono;
+export default GooglePay;

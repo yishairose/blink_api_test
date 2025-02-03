@@ -14,6 +14,11 @@ export default function Home() {
           Card ECOM
         </Link>
       </Button>
+      <Button>
+        <Link href="/gpay" className="text-2xl">
+          Google Pay
+        </Link>
+      </Button>
     </div>
   );
 }

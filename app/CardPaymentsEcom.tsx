@@ -14,9 +14,10 @@ import {
   createIntent,
   generateToken,
   makePaymentEcom,
+  refreshPageEcom,
 } from "@/lib/actions/blink";
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 function CardPaymentsEcom() {
   const [data, setData] = useState<null | any>(null);
@@ -38,7 +39,7 @@ function CardPaymentsEcom() {
     <>
       <h1 className="text-2xl">Card Payment flow Ecom</h1>
       {intent?.id ? (
-        <>
+        <div>
           <form id="payment" action={makePaymentEcom}>
             {data && (
               <input
@@ -58,7 +59,7 @@ function CardPaymentsEcom() {
             <Script src="https://secure.blinkpayment.co.uk/assets/js/api/custom.js"></Script>
           </form>
           <Script src="https://gateway2.blinkpayment.co.uk/sdk/web/v1/js/hostedfields.min.js"></Script>
-        </>
+        </div>
       ) : (
         <div className="text-red-500 w-full text-center">
           <div>{intent?.message}</div>
