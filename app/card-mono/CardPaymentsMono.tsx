@@ -13,73 +13,50 @@ import { Label } from "@/components/ui/label";
 import {
   createIntent,
   generateToken,
-  makePaymentEcom,
+  makePaymentMOTO,
 } from "@/lib/actions/blink";
 
 import { Fragment, useEffect, useRef, useState } from "react";
+import PaymentForm from "./PaymentForm";
 
-function CardPaymentsEcom() {
+function CardPaymentsMono() {
   const [data, setData] = useState<null | any>(null);
+  const [error, setError] = useState<null | string>(null);
   const [amount, setAmount] = useState(0);
   const [type, setType] = useState("SALE");
   const [layout, setLayout] = useState("basic");
   const [delay, setDelay] = useState(0);
   const [intent, setIntent] = useState(null);
-  const paymentFormRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     async function initiatePaymentProcess() {
-      const data = await generateToken();
-      setData(data);
+      try {
+        const data = await generateToken();
+        if (!data.success) throw new Error(data.error);
+        console.log(data);
+        setData(data);
+      } catch (error) {
+        setError(error.message);
+        console.log(error);
+      }
     }
     if (!data) initiatePaymentProcess();
   }, [data]);
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    const formData = new FormData(paymentFormRef.current);
-    const formDataObject = Object.fromEntries(formData.entries());
-    makePaymentEcom(formDataObject);
-  }
-
   return (
     <>
-      <h1 className="text-2xl">Card Payment flow Ecom</h1>
-
+      <h1 className="text-2xl">Card Payment flow MONO</h1>
+      {error && (
+        <div className="text-red-500 w-full text-center">
+          <div>{error}</div>
+        </div>
+      )}
       {intent?.id ? (
         <>
-          <form
-            id="payment"
-            onSubmit={handleSubmit}
-            ref={paymentFormRef}
-            method="POST"
-          >
-            {data && (
-              <input
-                type="hidden"
-                name="accessToken"
-                value={data.access_token}
-              />
-            )}
-
-            <div
-              dangerouslySetInnerHTML={{
-                __html: intent?.element.ccElement,
-              }}
-            />
-
-            <Button type="submit">Pay</Button>
-          </form>
-          <script
-            async
-            id="blink-hosted-fields"
-            src="https://gateway2.blinkpayment.co.uk/sdk/web/v1/js/hostedfields.min.js"
-          ></script>
-          <script
-            async
-            id="custom"
-            src="https://secure.blinkpayment.co.uk/assets/js/api/custom.js"
-          ></script>
+          <PaymentForm
+            html={intent.element.ccMotoElement}
+            accessToken={data?.access_token}
+          />
         </>
       ) : (
         <div className="text-red-500 w-full text-center">
@@ -87,7 +64,7 @@ function CardPaymentsEcom() {
           <div>{intent?.data?.amount[0]}</div>
         </div>
       )}
-      {data && !intent && (
+      {data?.success && !intent && (
         <form className="flex flex-col gap-4 items-start ">
           <h3 className="text-xl font-bold">Create Intent</h3>
           <div className="w-[180px]">
@@ -153,9 +130,10 @@ function CardPaymentsEcom() {
           </Button>
         </form>
       )}
+
       <Script src="https://code.jquery.com/jquery-3.6.3.min.js"></Script>
     </>
   );
 }
 
-export default CardPaymentsEcom;
+export default CardPaymentsMono;

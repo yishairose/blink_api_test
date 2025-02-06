@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import CardPaymentsEcom from "../CardPaymentsEcom";
+import CardPaymentsEcom from "./CardPaymentsEcom";
 import Link from "next/link";
 
 function page() {

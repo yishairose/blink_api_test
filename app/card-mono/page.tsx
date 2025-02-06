@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 
 import Link from "next/link";
-import CardPaymentsMono from "../CardPaymentsMono";
+import CardPaymentsMono from "./CardPaymentsMono";
 
 function page() {
   return (

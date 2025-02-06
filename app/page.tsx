@@ -6,7 +6,7 @@ export default function Home() {
     <div className="p-16 flex flex-col gap-8 justify-start items-start ">
       <Button>
         <Link href="/card-mono" className="text-2xl">
-          Card Mono
+          Card Moto
         </Link>
       </Button>
       <Button>

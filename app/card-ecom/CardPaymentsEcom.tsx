@@ -13,14 +13,14 @@ import { Label } from "@/components/ui/label";
 import {
   createIntent,
   generateToken,
-  makePaymentMOTO,
+  makePaymentEcom,
 } from "@/lib/actions/blink";
 
 import { Fragment, useEffect, useRef, useState } from "react";
+import PaymentForm from "./PaymentForm";
 
-function CardPaymentsMono() {
+function CardPaymentsEcom() {
   const [data, setData] = useState<null | any>(null);
-  const [error, setError] = useState<null | string>(null);
   const [amount, setAmount] = useState(0);
   const [type, setType] = useState("SALE");
   const [layout, setLayout] = useState("basic");
@@ -28,105 +28,30 @@ function CardPaymentsMono() {
   const [intent, setIntent] = useState(null);
   const paymentFormRef = useRef<HTMLFormElement>(null);
 
-  // const [isFormLoaded, setIsFormLoaded] = useState(false);
-
-  // useEffect(() => {
-  //   console.log("Form ref", formRef.current);
-  //   if (formRef.current) {
-  //     setIsFormLoaded(true);
-  //     console.log("Form loaded");
-  //     // Load external script dynamically
-  //     const script1 = document.createElement("script");
-  //     script1.src =
-  //       "https://gateway2.blinkpayment.co.uk/sdk/web/v1/js/hostedfields.min.js";
-  //     script1.async = true;
-  //     document.body.appendChild(script1);
-  //     const script2 = document.createElement("script");
-  //     script2.src = "https://secure.blinkpayment.co.uk/assets/js/api/custom.js";
-  //     script2.async = true;
-  //     document.body.appendChild(script2);
-
-  //     return () => {
-  //       document.body.removeChild(script1);
-  //       document.body.removeChild(script2);
-  //       console.log("Script removed when form is unmounted");
-  //     };
-  //   }
-  // }, [intent]);
-
   useEffect(() => {
     async function initiatePaymentProcess() {
-      try {
-        const data = await generateToken();
-        if (!data.success) throw new Error(data.error);
-        console.log(data);
-        setData(data);
-      } catch (error) {
-        setError(error.message);
-        console.log(error);
-      }
+      const data = await generateToken();
+      setData(data);
     }
     if (!data) initiatePaymentProcess();
   }, [data]);
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    const formData = new FormData(paymentFormRef.current);
-    const formDataObject = Object.fromEntries(formData.entries());
-    makePaymentMOTO(formDataObject);
-  }
-
   return (
     <>
-      <h1 className="text-2xl">Card Payment flow MONO</h1>
-      {error && (
-        <div className="text-red-500 w-full text-center">
-          <div>{error}</div>
-        </div>
-      )}
+      <h1 className="text-2xl">Card Payment flow Ecom</h1>
+
       {intent?.id ? (
-        <>
-          <form
-            id="payment"
-            onSubmit={handleSubmit}
-            ref={paymentFormRef}
-            method="POST"
-          >
-            {data && (
-              <input
-                type="hidden"
-                name="accessToken"
-                value={data.access_token}
-              />
-            )}
-
-            <div
-              dangerouslySetInnerHTML={{
-                __html: intent?.element.ccMotoElement,
-              }}
-            />
-
-            <Button type="submit">Pay</Button>
-          </form>
-
-          <script
-            async
-            id="blink-hosted-fields"
-            src="https://gateway2.blinkpayment.co.uk/sdk/web/v1/js/hostedfields.min.js"
-          ></script>
-          <script
-            async
-            id="custom"
-            src="https://secure.blinkpayment.co.uk/assets/js/api/custom.js"
-          ></script>
-        </>
+        <PaymentForm
+          html={intent.element.ccElement}
+          accessToken={data?.access_token}
+        />
       ) : (
         <div className="text-red-500 w-full text-center">
           <div>{intent?.message}</div>
           <div>{intent?.data?.amount[0]}</div>
         </div>
       )}
-      {data?.success && !intent && (
+      {data && !intent && (
         <form className="flex flex-col gap-4 items-start ">
           <h3 className="text-xl font-bold">Create Intent</h3>
           <div className="w-[180px]">
@@ -192,10 +117,9 @@ function CardPaymentsMono() {
           </Button>
         </form>
       )}
-
       <Script src="https://code.jquery.com/jquery-3.6.3.min.js"></Script>
     </>
   );
 }
 
-export default CardPaymentsMono;
+export default CardPaymentsEcom;

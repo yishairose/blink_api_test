@@ -79,50 +79,112 @@ export const createIntent = async (
     return error;
   }
 };
+type PaymentData = {
+  device_timezone: string;
+  device_capabilities: string;
+  device_accept_language: string;
+  device_screen_resolution: string;
+  remote_address: string;
+  accessToken: string;
+  payment_intent: string;
+  paymentToken: string;
+  type: string;
+  customer_email: string;
+  customer_name: string;
+  customer_address: string;
+  customer_postcode: string;
+  transaction_unique: string;
+};
+export const makePaymentMOTO = async (data: PaymentData) => {
+  const {
+    accessToken,
+    payment_intent,
+    paymentToken,
+    type,
+    customer_email,
+    customer_name,
+    customer_address,
+    customer_postcode,
+    transaction_unique,
+  } = data;
 
-export const makePaymentMOTO = async (data: FormData) => {
-  console.log(data);
-  // const access_token = data.get("access_token");
-  // const payment_intent = data.get("payment_intent");
-  // const paymentToken = data.get("paymentToken");
-  // const type = data.get("type");
-  // const customer_email = data.get("customer_email");
-  // const customer_name = data.get("customer_name");
-  // const customer_address = data.get("customer_address");
-  // const customer_postcode = data.get("customer_postcode");
-  // const transaction_unique = data.get("transaction_unique");
+  const body = {
+    payment_intent,
+    paymentToken,
+    type,
+    customer_email,
+    customer_name,
+    customer_address,
+    customer_postcode,
+    transaction_unique,
+  };
+  console.log(body);
 
-  // const body = {
-  //   payment_intent,
-  //   paymentToken,
-  //   type,
-  //   customer_email,
-  //   customer_name,
-  //   customer_address,
-  //   customer_postcode,
-  //   transaction_unique,
-  // };
-
-  // try {
-  //   const response = await fetch(`${URL}/creditcards`, {
-  //     method: "POST",
-  //     body: JSON.stringify(body),
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       Authorization: `Bearer ${access_token}`,
-  //     },
-  //   });
-  //   const data = await response.json();
-  //   console.log(data);
-  //   return data;
-  // } catch (error) {
-  //   if (error instanceof Error) return error?.message;
-  //   return error;
-  // }
+  try {
+    const response = await fetch(`${URL}/creditcards`, {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+        "Accept-Charset": "UTF-8",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const data = await response.json();
+    console.log(data);
+    return data;
+  } catch (error) {
+    if (error instanceof Error) return error?.message;
+    return error;
+  }
 };
 
-export const makePaymentEcom = async (data) => {
-  console.log(data);
+export const makePaymentEcom = async (data: PaymentData) => {
+  const {
+    device_capabilities,
+    device_accept_language,
+    device_screen_resolution,
+    device_timezone,
+    remote_address,
+    accessToken,
+    payment_intent,
+    paymentToken,
+    type,
+    customer_email,
+    customer_name,
+    transaction_unique,
+  } = data;
+
+  const body = {
+    payment_intent,
+    paymentToken,
+    type,
+    customer_email,
+    customer_name,
+    transaction_unique,
+    device_capabilities,
+    device_accept_language,
+    device_screen_resolution,
+    device_timezone,
+    remote_address,
+  };
+  console.log(body);
+  try {
+    const response = await fetch(`${URL}/creditcards`, {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: {
+        "Accept-Charset": "UTF-8",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    if (error instanceof Error) return error?.message;
+    return error;
+  }
 };
 export const makePaymentGpay = async (data: FormData) => {
   console.log(data);
