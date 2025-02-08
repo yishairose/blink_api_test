@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { PaymentData } from "../types";
 
 const URL = process.env.BLINK_API_URL;
 const API_KEY = process.env.BLINK_API_KEY;
@@ -73,28 +74,13 @@ export const createIntent = async (
     });
     const data = await response.json();
     console.log(data);
-    return data;
+    return { success: true, ...data };
   } catch (error) {
     if (error instanceof Error) return error?.message;
-    return error;
+    return { success: false, error: error };
   }
 };
-type PaymentData = {
-  device_timezone: string;
-  device_capabilities: string;
-  device_accept_language: string;
-  device_screen_resolution: string;
-  remote_address: string;
-  accessToken: string;
-  payment_intent: string;
-  paymentToken: string;
-  type: string;
-  customer_email: string;
-  customer_name: string;
-  customer_address: string;
-  customer_postcode: string;
-  transaction_unique: string;
-};
+
 export const makePaymentMOTO = async (data: PaymentData) => {
   const {
     accessToken,
@@ -132,10 +118,10 @@ export const makePaymentMOTO = async (data: PaymentData) => {
     });
     const data = await response.json();
     console.log(data);
-    return data;
+    return { success: true, ...data };
   } catch (error) {
     if (error instanceof Error) return error?.message;
-    return error;
+    return { success: false, error: error };
   }
 };
 
@@ -180,12 +166,13 @@ export const makePaymentEcom = async (data: PaymentData) => {
       },
     });
     const data = await response.json();
-    return data;
+    return { success: true, ...data };
   } catch (error) {
     if (error instanceof Error) return error?.message;
-    return error;
+    return { success: false, error: error };
   }
 };
+
 export const makePaymentGpay = async (data: FormData) => {
   console.log(data);
 };

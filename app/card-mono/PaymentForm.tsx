@@ -1,48 +1,28 @@
 import { Button } from "@/components/ui/button";
 import { makePaymentMOTO } from "@/lib/actions/blink";
+import { setUpHostedfields } from "@/lib/hostedFields";
+import { PaymentData } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
-export async function hostedFieldsSetup(selector: string) {
-  const form: HTMLFormElement | null = document.querySelector(selector);
-
-  if (!form) return;
-
-  try {
-    $("input[type='hostedfield:cardNumber']").hostedField({
-      nativeEvents: true,
-    });
-    $("input[type='hostedfield:cardExpiryDate']").hostedField({
-      nativeEvents: true,
-    });
-    $("input[type='hostedfield:cardCvv']").hostedField({
-      nativeEvents: true,
-    });
-  } catch (error) {
-    console.log("failed to create fields", error);
-  }
-}
-
-function PaymentForm({ html, accessToken }) {
+function PaymentForm({
+  html,
+  accessToken,
+}: {
+  html: string;
+  accessToken: string;
+}) {
   const router = useRouter();
   useEffect(() => {
-    hostedFieldsSetup("#payment");
+    setUpHostedfields("#payment");
   }, []);
-  type PaymentData = {
-    accessToken: string;
-    payment_intent: string;
-    paymentToken: string;
-    type: string;
-    customer_email: string;
-    customer_name: string;
-    customer_address: string;
-    customer_postcode: string;
-    transaction_unique: string;
-  };
-  async function handleSubmit(e) {
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    //Select form element from DOM
     const form: HTMLFormElement | null = document.querySelector("#payment");
     if (!form) return;
+    //Create hostedForm instance
     const hostedForm: any = $(form).hostedForm("instance");
     try {
       const response = await hostedForm.getPaymentDetails();
@@ -55,7 +35,9 @@ function PaymentForm({ html, accessToken }) {
 
       const returnUrl = await makePaymentMOTO(data as PaymentData);
       router.replace(returnUrl.url);
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (

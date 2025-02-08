@@ -18,6 +18,7 @@ import {
 
 import { Fragment, useEffect, useRef, useState } from "react";
 import Head from "next/head";
+import PaymentForm from "./PaymentForm";
 
 function GooglePay() {
   const [data, setData] = useState<null | any>(null);
@@ -46,48 +47,11 @@ function GooglePay() {
     <>
       <h1 className="text-2xl">Card Payment flow Google Pay</h1>
       {intent?.id ? (
-        <div>
-          <form
-            id="payment"
-            onSubmit={handleSubmit}
-            ref={paymentFormRef}
-            method="POST"
-          >
-            {data && (
-              <input
-                type="hidden"
-                name="accessToken"
-                value={data.access_token}
-              />
-            )}
-
-            <div
-              dangerouslySetInnerHTML={{
-                __html: intent?.element.ccElement,
-              }}
-            />
-
-            <Button type="submit">Pay</Button>
-          </form>
-
-          <form action={makePaymentGpay} id="gpPayment">
-            <div
-              dangerouslySetInnerHTML={{
-                __html: intent?.element.gpElement,
-              }}
-            />
-          </form>
-          <script
-            async
-            id="blink-hosted-fields"
-            src="https://gateway2.blinkpayment.co.uk/sdk/web/v1/js/hostedfields.min.js"
-          ></script>
-          <script
-            async
-            id="custom"
-            src="https://secure.blinkpayment.co.uk/assets/js/api/custom.js"
-          ></script>
-        </div>
+        <PaymentForm
+          htmlCC={intent?.element.ccElement}
+          htmlGp={intent?.element.gpElement}
+          accessToken={data?.access_token}
+        />
       ) : (
         <div className="text-red-500 w-full text-center">
           <div>{intent?.message}</div>

@@ -10,23 +10,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import {
-  createIntent,
-  generateToken,
-  makePaymentMOTO,
-} from "@/lib/actions/blink";
+import { createIntent, generateToken } from "@/lib/actions/blink";
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import PaymentForm from "./PaymentForm";
+import { PaymentIntentResponse } from "@/lib/types";
 
 function CardPaymentsMono() {
-  const [data, setData] = useState<null | any>(null);
-  const [error, setError] = useState<null | string>(null);
+  const [accessToken, setAccessToken] = useState(null);
+  const [errors, setErrors] = useState<Error | null>(null);
+  const [intent, setIntent] = useState<
+    null | PaymentIntentResponse | { success: false; error: string }
+  >(null);
   const [amount, setAmount] = useState(0);
   const [type, setType] = useState("SALE");
   const [layout, setLayout] = useState("basic");
   const [delay, setDelay] = useState(0);
-  const [intent, setIntent] = useState(null);
 
   useEffect(() => {
     async function initiatePaymentProcess() {
@@ -34,37 +33,30 @@ function CardPaymentsMono() {
         const data = await generateToken();
         if (!data.success) throw new Error(data.error);
         console.log(data);
-        setData(data);
+        setAccessToken(data.access_token);
       } catch (error) {
-        setError(error.message);
+        setErrors(error as Error);
         console.log(error);
       }
     }
-    if (!data) initiatePaymentProcess();
-  }, [data]);
+    if (!accessToken) initiatePaymentProcess();
+  }, [accessToken]);
 
   return (
     <>
-      <h1 className="text-2xl">Card Payment flow MONO</h1>
-      {error && (
+      <h1 className="text-2xl">Card Payment flow MOTO</h1>
+      {errors && (
         <div className="text-red-500 w-full text-center">
-          <div>{error}</div>
+          <div>{errors.message}</div>
         </div>
       )}
-      {intent?.id ? (
-        <>
-          <PaymentForm
-            html={intent.element.ccMotoElement}
-            accessToken={data?.access_token}
-          />
-        </>
-      ) : (
-        <div className="text-red-500 w-full text-center">
-          <div>{intent?.message}</div>
-          <div>{intent?.data?.amount[0]}</div>
-        </div>
+      {intent?.success && accessToken && (
+        <PaymentForm
+          accessToken={accessToken}
+          html={intent?.element.ccMotoElement}
+        />
       )}
-      {data?.success && !intent && (
+      {accessToken && !intent && (
         <form className="flex flex-col gap-4 items-start ">
           <h3 className="text-xl font-bold">Create Intent</h3>
           <div className="w-[180px]">
@@ -115,8 +107,8 @@ function CardPaymentsMono() {
           <Button
             onClick={async (e) => {
               e.preventDefault();
-              if (!data) return;
-              const intent = await createIntent(data?.access_token, {
+              if (!accessToken) return;
+              const intent = await createIntent(accessToken, {
                 transaction_type: type,
                 amount,
                 card_layout: layout,
