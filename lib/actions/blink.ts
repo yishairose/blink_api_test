@@ -173,6 +173,6 @@ export const makePaymentEcom = async (data: PaymentData) => {
   }
 };
 
-export const makePaymentGpay = async (data: FormData) => {
+export const makePaymentGpay = async (data: PaymentData) => {
   console.log(data);
 };

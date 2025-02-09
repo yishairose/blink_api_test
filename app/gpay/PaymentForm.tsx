@@ -1,45 +1,27 @@
 import { Button } from "@/components/ui/button";
-import { makePaymentGpay, makePaymentMOTO } from "@/lib/actions/blink";
-import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import { makePaymentGpay } from "@/lib/actions/blink";
+import { getDeviceDetails, setUpHostedfields } from "@/lib/hostedFields";
+import { PaymentData } from "@/lib/types";
 
-export async function hostedFieldsSetup(selector: string) {
-  const form: HTMLFormElement | null = document.querySelector(selector);
+import React, { useEffect, useRef } from "react";
 
-  if (!form) return;
-
-  try {
-    $("input[type='hostedfield:cardNumber']").hostedField({
-      nativeEvents: true,
-    });
-    $("input[type='hostedfield:cardExpiryDate']").hostedField({
-      nativeEvents: true,
-    });
-    $("input[type='hostedfield:cardCvv']").hostedField({
-      nativeEvents: true,
-    });
-  } catch (error) {
-    console.log("failed to create fields", error);
-  }
-}
-
-function PaymentForm({ htmlCC, htmlGp, accessToken }) {
-  const router = useRouter();
+function PaymentForm({
+  htmlCC,
+  htmlGp,
+  accessToken,
+}: {
+  htmlCC: string;
+  htmlGp: string;
+  accessToken: string;
+}) {
   useEffect(() => {
-    hostedFieldsSetup("#payment");
+    setUpHostedfields("#payment");
+    getDeviceDetails();
   }, []);
-  type PaymentData = {
-    accessToken: string;
-    payment_intent: string;
-    paymentToken: string;
-    type: string;
-    customer_email: string;
-    customer_name: string;
-    customer_address: string;
-    customer_postcode: string;
-    transaction_unique: string;
-  };
-  async function handleSubmit(e) {
+
+  const containerRef = useRef<HTMLFormElement>(null);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form: HTMLFormElement | null = document.querySelector("#payment");
     if (!form) return;
@@ -51,16 +33,53 @@ function PaymentForm({ htmlCC, htmlGp, accessToken }) {
       const data = {
         paymentToken,
         ...Object.fromEntries(formData.entries()),
-      };
+      } as PaymentData;
 
-      const res = await makePaymentGpay(data as PaymentData);
+      const res = await makePaymentGpay(data);
       console.log(res);
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   }
+
+  useEffect(() => {
+    // Check if scripts have been executed - required for strict mode
+    if (window.scriptsExecuted) return;
+
+    // Function to extract scripts from html and execute seperately
+    const executeScripts = () => {
+      if (!containerRef.current) return;
+
+      // Find all script tags
+      const scripts = containerRef.current.getElementsByTagName("script");
+
+      Array.from(scripts).forEach((oldScript) => {
+        // Create a new script element
+        const newScript = document.createElement("script");
+
+        // Copy all attributes
+        Array.from(oldScript.attributes).forEach((attr) => {
+          newScript.setAttribute(attr.name, attr.value);
+        });
+        console.log(scripts);
+
+        // Copy the content
+        newScript.innerHTML = oldScript.innerHTML;
+
+        // Replace old script with new one
+        if (oldScript.parentNode) {
+          oldScript.parentNode.replaceChild(newScript, oldScript);
+        }
+      });
+    };
+
+    executeScripts();
+    window.scriptsExecuted = true;
+  }, []);
 
   return (
     <>
-      <form id="payment" method="POST" onSubmit={handleSubmit}>
+      {/* <form id="payment" method="POST" onSubmit={handleSubmit}>
         <input type="hidden" name="accessToken" value={accessToken} />
 
         <div
@@ -68,10 +87,8 @@ function PaymentForm({ htmlCC, htmlGp, accessToken }) {
             __html: htmlCC,
           }}
         />
-
-        <Button type="submit">Pay</Button>
-      </form>
-      <form id="gpPayment" onSubmit={handleSubmit} method="POST">
+      </form> */}
+      <form id="gpPayment" method="POST" ref={containerRef} className="">
         <div
           dangerouslySetInnerHTML={{
             __html: htmlGp,
