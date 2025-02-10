@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 function LinkForm() {
   const [accessToken, setAccessToken] = useState(null);
@@ -20,7 +21,7 @@ function LinkForm() {
   const [email, setEmail] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const [amount, setAmount] = useState("");
-
+  const router = useRouter();
   useEffect(() => {
     async function initiatePaymentProcess() {
       try {
@@ -49,6 +50,10 @@ function LinkForm() {
       amount: +amount,
     });
     console.log(res);
+
+    if (res.success) {
+      router.replace(res.paylink_url);
+    }
   }
   return (
     <form onSubmit={handleSubmit}>
