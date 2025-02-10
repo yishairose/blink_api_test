@@ -79,7 +79,7 @@ function PaymentForm({
 
   return (
     <>
-      {/* <form id="payment" method="POST" onSubmit={handleSubmit}>
+      <form id="payment" method="POST" onSubmit={handleSubmit}>
         <input type="hidden" name="accessToken" value={accessToken} />
 
         <div
@@ -87,7 +87,7 @@ function PaymentForm({
             __html: htmlCC,
           }}
         />
-      </form> */}
+      </form>
       <form id="gpPayment" method="POST" ref={containerRef} className="">
         <div
           dangerouslySetInnerHTML={{

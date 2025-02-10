@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { PaymentData } from "../types";
+import { redirect } from "next/dist/server/api-utils";
 
 const URL = process.env.BLINK_API_URL;
 const API_KEY = process.env.BLINK_API_KEY;
@@ -46,16 +47,24 @@ export const createIntent = async (
     amount,
     card_layout,
     delay_capture_days,
+    customer_email,
+    customer_name,
+    payment_type,
   }: {
     transaction_type: string;
     amount: number;
     card_layout: string;
     delay_capture_days: number;
+    customer_email?: string;
+    customer_name?: string;
+    payment_type?: string;
   }
 ) => {
   const reqBody = {
+    customer_name,
+    customer_email,
     transaction_type,
-    payment_type: "credit-card",
+    payment_type: payment_type || "credit-card",
     amount,
     currency: "GBP",
     card_layout,
@@ -175,4 +184,95 @@ export const makePaymentEcom = async (data: PaymentData) => {
 
 export const makePaymentGpay = async (data: PaymentData) => {
   console.log(data);
+};
+
+export const makeOBReq = async (data: {
+  payment_intent: string;
+  customerName: string;
+  customerEmail: string;
+  transaction_unique: string;
+  accessToken: string;
+}) => {
+  const {
+    payment_intent,
+    customerName,
+    customerEmail,
+    transaction_unique,
+    accessToken,
+  } = data;
+  try {
+    const body = {
+      payment_intent,
+      customer_name: customerName,
+      customer_email: customerEmail,
+      transaction_unique,
+    };
+
+    const response = await fetch(`${URL}/openbankings`, {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: {
+        "Accept-Charset": "UTF-8",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const data = await response.json();
+
+    return { success: true, ...data };
+  } catch (error) {
+    if (error instanceof Error) return error?.message;
+    return { success: false, error: error };
+  }
+};
+
+export const createPaymentLink = async (data: {
+  payment_method: string;
+  full_name: string;
+  email: string;
+  mobile_number: string;
+  accessToken: string;
+  amount: number;
+}) => {
+  const {
+    payment_method,
+    full_name,
+    email,
+    mobile_number,
+    accessToken,
+    amount,
+  } = data;
+
+  try {
+    const body = {
+      payment_method: [payment_method],
+      transaction_type: "SALE",
+      full_name,
+      email,
+      mobile_number,
+      amount,
+      currency: "GBP",
+      redirect_url: "http://localhost:3000/success",
+      reference: "test",
+    };
+    console.log(body);
+
+    const response = await fetch(
+      `https://secure.blinkpayment.co.uk/api/paylink/v1/paylinks`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+    return { success: true, ...data };
+  } catch (error) {
+    if (error instanceof Error) return error?.message;
+    return { success: false, error: error };
+  }
 };

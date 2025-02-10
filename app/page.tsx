@@ -19,6 +19,21 @@ export default function Home() {
           Google Pay
         </Link>
       </Button>
+      <Button>
+        <Link href="/open-banking" className="text-2xl">
+          Open Banking
+        </Link>
+      </Button>
+      <Button>
+        <Link href="/direct-debit" className="text-2xl">
+          Direct Debit
+        </Link>
+      </Button>
+      <Button>
+        <Link href="/pay-link" className="text-2xl">
+          Pay Link
+        </Link>
+      </Button>
     </div>
   );
 }
