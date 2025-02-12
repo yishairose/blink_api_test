@@ -276,3 +276,132 @@ export const createPaymentLink = async (data: {
     return { success: false, error: error };
   }
 };
+
+export const setUpDirectDebit = async (data: {
+  payment_intent: string;
+  given_name: string;
+  family_name: string;
+  email: string;
+  account_holder_name: string;
+  account_number: string;
+  branch_code: string;
+  accessToken: string;
+}) => {
+  const {
+    payment_intent,
+    given_name,
+    family_name,
+    email,
+    account_holder_name,
+    account_number,
+    branch_code,
+    accessToken,
+  } = data;
+  try {
+    const body = {
+      payment_intent,
+      given_name,
+      family_name,
+      email,
+      account_holder_name,
+      account_number,
+      branch_code,
+    };
+
+    const response = await fetch(`${URL}/directdebits`, {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const data = await response.json();
+    console.log(data);
+    return { success: true, ...data };
+  } catch (error) {
+    if (error instanceof Error) return error?.message;
+    return { success: false, error: error };
+  }
+};
+
+export const setUpRepeatPayments = async (data: {
+  payment_intent: string;
+  payment_token: string;
+  accessToken: string;
+  customer_name: string;
+}) => {
+  const { payment_intent, payment_token, accessToken, customer_name } = data;
+  try {
+    const body = {
+      payment_intent,
+      payment_type: "fixed_schedule",
+      payment_token,
+      type: 1,
+      customer_name: customer_name,
+      reference: "Test ref",
+      currency: "GBP",
+      frequency: "days",
+      frequency_duration: 4,
+      first_amount: 2.0,
+      recurring_amount: 3.0,
+    };
+
+    const response = await fetch(`${URL}/repeat-payments`, {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const data = await response.json();
+    console.log(data);
+    return { success: true, ...data };
+  } catch (error) {
+    if (error instanceof Error) return error?.message;
+    return { success: false, error: error };
+  }
+};
+
+export const cancelTransaction = async (
+  transaction_id: string,
+  accessToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${URL}/transactions/${transaction_id}/cancels`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+    return { success: true, ...data };
+  } catch (error) {
+    if (error instanceof Error) return error?.message;
+    return { success: false, error: error };
+  }
+};
+export const getTransaction = async (
+  transaction_id: string,
+  accessToken: string
+) => {
+  try {
+    const response = await fetch(`${URL}/transactions/${transaction_id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const data = await response.json();
+    console.log(data);
+    return { success: true, ...data };
+  } catch (error) {
+    if (error instanceof Error) return error?.message;
+    return { success: false, error: error };
+  }
+};

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { setUpDirectDebit } from "@/lib/actions/blink";
 import { PaymentIntentResponse } from "@/lib/types";
 
 import { useState } from "react";
@@ -21,6 +22,28 @@ function PaymentForm({
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    console.log({
+      payment_intent: intent,
+      accessToken,
+      given_name: givenName,
+      family_name: familyName,
+      email,
+      account_holder_name: accountHolderName,
+      branch_code: branchCode,
+      account_number: accountNumber,
+    });
+    const res = await setUpDirectDebit({
+      payment_intent: intent,
+      accessToken,
+      given_name: givenName,
+      family_name: familyName,
+      email,
+      account_holder_name: accountHolderName,
+      branch_code: branchCode,
+      account_number: accountNumber,
+    });
+    console.log(res);
   }
 
   return (
