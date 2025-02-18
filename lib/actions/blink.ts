@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { PaymentData } from "../types";
 import { redirect } from "next/dist/server/api-utils";
+import { param } from "jquery";
 
 const URL = process.env.BLINK_API_URL;
 const API_KEY = process.env.BLINK_API_KEY;
@@ -327,24 +328,33 @@ export const setUpDirectDebit = async (data: {
 
 export const setUpRepeatPayments = async (data: {
   payment_intent: string;
-  payment_token: string;
+  paymentToken: string;
   accessToken: string;
   customer_name: string;
+  customer_email: string;
 }) => {
-  const { payment_intent, payment_token, accessToken, customer_name } = data;
+  const {
+    payment_intent,
+    paymentToken,
+    accessToken,
+    customer_name,
+    customer_email,
+  } = data;
   try {
     const body = {
       payment_intent,
       payment_type: "fixed_schedule",
-      payment_token,
+      paymentToken,
       type: 1,
       customer_name: customer_name,
+      customer_email: customer_email,
       reference: "Test ref",
       currency: "GBP",
       frequency: "days",
       frequency_duration: 4,
       first_amount: 2.0,
       recurring_amount: 3.0,
+      is_limited_installments: false,
     };
 
     const response = await fetch(`${URL}/repeat-payments`, {
@@ -402,6 +412,168 @@ export const getTransaction = async (
     return { success: true, ...data };
   } catch (error) {
     if (error instanceof Error) return error?.message;
+    return { success: false, error: error };
+  }
+};
+
+export const refundTransaction = async (
+  transaction_id: string,
+  accessToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${URL}/transactions/${transaction_id}/refunds`,
+      {
+        method: "POST",
+        //Add amount and partial refund params for partial refunds
+        body: JSON.stringify({}),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+    if (data.hasOwnProperty("error")) throw new Error(data.error);
+    return { success: true, ...data };
+  } catch (error) {
+    if (error instanceof Error) return { success: false, error: error.message };
+    return { success: false, error: error };
+  }
+};
+export const reRunTransaction = async (
+  transaction_id: string,
+  accessToken: string
+) => {
+  try {
+    const response = await fetch(
+      `${URL}/transactions/${transaction_id}/reruns`,
+      {
+        method: "POST",
+        //Amount, transaction_unique and delay_capture_days optional
+        body: JSON.stringify({}),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+    if (data.hasOwnProperty("error")) throw new Error(data.error);
+    return { success: true, ...data };
+  } catch (error) {
+    if (error instanceof Error) return { success: false, error: error.message };
+    return { success: false, error: error };
+  }
+};
+
+export const getAllRepeatPayments = async (accessToken: string) => {
+  const params = [
+    { key: "payment_type", value: "fixed_schedule" },
+    { key: "page", value: 1 },
+    // { key: "status", value: "active" },
+  ];
+  try {
+    const response = await fetch(
+      `${URL}/repeat-payments?${params
+        .map((param) => `${param.key}=${param.value}`)
+        .join("&")}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+    if (data.hasOwnProperty("error")) throw new Error(data);
+    return { success: true, ...data };
+  } catch (error) {
+    if (error instanceof Error) return { success: false, error: error };
+  }
+};
+export const getRepeatPaymentById = async (accessToken: string, id: number) => {
+  const params = [{ key: "payment_type", value: "fixed_schedule" }];
+  try {
+    const response = await fetch(
+      `${URL}/repeat-payments/${+id}?${params
+        .map((param) => `${param.key}=${param.value}`)
+        .join("&")}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+    return { success: true, ...data };
+  } catch (error) {
+    if (error instanceof Error) return error?.message;
+    return { success: false, error: error };
+  }
+};
+export const deleteRepeatPaymentById = async (
+  accessToken: string,
+  id: number
+) => {
+  const params = [{ key: "payment_type", value: "fixed_schedule" }];
+  try {
+    const response = await fetch(
+      `${URL}/repeat-payments/${+id}?${params
+        .map((param) => `${param.key}=${param.value}`)
+        .join("&")}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    if (data.hasOwnProperty("error")) throw new Error(data.error);
+    console.log(data);
+    return { success: true, ...data };
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
+      return { success: false, error: error.message };
+    }
+    return { success: false, error: error };
+  }
+};
+export const cancelRepeatPaymentById = async (
+  accessToken: string,
+  id: number,
+  recurring_id: number
+) => {
+  const body = {
+    payment_type: "fixed_schedule",
+    recurring_id: recurring_id,
+  };
+
+  try {
+    const response = await fetch(`${URL}/repeat-payments/cancel/${+id}`, {
+      method: "DELETE",
+      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const data = await response.json();
+    if (data.hasOwnProperty("error")) throw new Error(data.error);
+    console.log(data);
+    return { success: true, ...data };
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
+      return { success: false, error: error.message };
+    }
     return { success: false, error: error };
   }
 };

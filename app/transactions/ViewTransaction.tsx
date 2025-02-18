@@ -31,7 +31,7 @@ function ViewTransaction() {
     }
     if (!accessToken) initiatePaymentProcess();
   }, [accessToken]);
-  const router = useRouter();
+
   async function handlesubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!accessToken) return;
@@ -58,6 +58,7 @@ function ViewTransaction() {
         <Button type="submit">Submit </Button>
         {transaction && transaction.success && (
           <TransactionCard
+            accessToken={accessToken}
             transaction={transaction}
             setTransaction={setTransaction}
           />

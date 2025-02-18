@@ -1,6 +1,9 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, Mail, User, RefreshCcw, Globe, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { refundTransaction, reRunTransaction } from "@/lib/actions/blink";
+import { useToast } from "@/hooks/use-toast";
 
 interface TransactionData {
   transaction_id: string;
@@ -20,13 +23,16 @@ interface TransactionCardProps {
     data: TransactionData;
   };
   setTransaction: (transaction: any) => void;
+  accessToken: string | null;
 }
 
 export default function TransactionCard({
   transaction,
   setTransaction,
+  accessToken,
 }: TransactionCardProps) {
   const data = transaction?.data || ({} as TransactionData);
+  const { toast } = useToast();
 
   return (
     <Card className="w-full max-w-2xl">
@@ -44,6 +50,64 @@ export default function TransactionCard({
         </div>
       </CardHeader>
       <CardContent className="p-6">
+        <div className="flex justify-between items-center">
+          <Button
+            variant="outline"
+            className="mb-8"
+            onClick={async (e) => {
+              e.preventDefault();
+              // Refund the transaction
+              if (!accessToken) return;
+              try {
+                const res = await refundTransaction(
+                  data.transaction_id,
+                  accessToken
+                );
+                if (res.success) {
+                  setTransaction(null);
+                }
+                if (!res.success) throw new Error(res.error);
+              } catch (error) {
+                toast({
+                  title: "Error",
+                  description: error ? error.message : "Something went wrong",
+                  variant: "destructive",
+                  duration: 5000,
+                });
+              }
+            }}
+          >
+            Refund
+          </Button>
+          <Button
+            variant="outline"
+            className="mb-8"
+            onClick={async (e) => {
+              e.preventDefault();
+              // Refund the transaction
+              if (!accessToken) return;
+              try {
+                const res = await reRunTransaction(
+                  data.transaction_id,
+                  accessToken
+                );
+                if (res.success) {
+                  setTransaction(null);
+                }
+                if (!res.success) throw new Error(res.error);
+              } catch (error) {
+                toast({
+                  title: "Error",
+                  description: error ? error.message : "Something went wrong",
+                  variant: "destructive",
+                  duration: 5000,
+                });
+              }
+            }}
+          >
+            Rerun
+          </Button>
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">

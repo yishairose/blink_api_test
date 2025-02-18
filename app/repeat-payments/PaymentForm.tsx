@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { makePaymentMOTO, setUpRepeatPayments } from "@/lib/actions/blink";
 import { setUpHostedfields } from "@/lib/hostedFields";
@@ -31,10 +32,17 @@ function PaymentForm({
       const data = {
         paymentToken,
         customer_name: formData.customer_name,
+        customer_email: formData.customer_email,
         accessToken,
         payment_intent: formData.payment_intent,
       };
+
       const res = await setUpRepeatPayments(data);
+
+      if (res.success) {
+        router.replace("/");
+      }
+      console.log(res);
     } catch (error) {
       console.error(error);
     }

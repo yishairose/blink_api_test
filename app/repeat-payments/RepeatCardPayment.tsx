@@ -12,7 +12,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { createIntent, generateToken } from "@/lib/actions/blink";
 
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PaymentForm from "./PaymentForm";
 import { PaymentIntentResponse } from "@/lib/types";
 
@@ -43,8 +43,7 @@ function RepeatCardPayment() {
   }, [accessToken]);
 
   return (
-    <>
-      <h1 className="text-2xl">Repeat Payment Flow</h1>
+    <div className="flex  w-screen justify-between items-center">
       {errors && (
         <div className="text-red-500 w-full text-center">
           <div>{errors.message}</div>
@@ -124,7 +123,7 @@ function RepeatCardPayment() {
       )}
 
       <Script src="https://code.jquery.com/jquery-3.6.3.min.js"></Script>
-    </>
+    </div>
   );
 }
 

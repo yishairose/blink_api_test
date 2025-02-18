@@ -11,6 +11,12 @@ function page() {
           Home
         </Link>
       </Button>
+      <h1 className="text-2xl">Repeat Payment Flow</h1>
+      <Button>
+        <Link href="repeat-payments/actions" className="text-lg">
+          Repeat Payment Action
+        </Link>
+      </Button>
       <RepeatCardPayment />
     </div>
   );
