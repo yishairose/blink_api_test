@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { PaymentData } from "../types";
 import { redirect } from "next/dist/server/api-utils";
 import { param } from "jquery";
+import { access } from "fs";
 
 const URL = process.env.BLINK_API_URL;
 const API_KEY = process.env.BLINK_API_KEY;
@@ -278,6 +279,71 @@ export const createPaymentLink = async (data: {
   }
 };
 
+export const getAllPayLinks = async (accessToken: string) => {
+  try {
+    const response = await fetch(
+      `https://secure.blinkpayment.co.uk/api/paylink/v1/paylinks`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+    return { success: true, ...data };
+  } catch (error) {
+    if (error instanceof Error) return error?.message;
+    return { success: false, error: error };
+  }
+};
+export const updatePayLink = async (accessToken: string, id: string) => {
+  const body = {
+    email: "yishai098@gmail.com",
+  };
+  try {
+    const response = await fetch(
+      `https://secure.blinkpayment.co.uk/api/paylink/v1/paylinks/${id}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+    return { success: true, ...data };
+  } catch (error) {
+    if (error instanceof Error) return error?.message;
+    return { success: false, error: error };
+  }
+};
+
+export const paylinkNotification = async (accessToken: string, id: string) => {
+  try {
+    const response = await fetch(
+      `https://secure.blinkpayment.co.uk/api/paylink/v1/paylinks/${id}/notifications`,
+      {
+        method: "POST",
+        body: JSON.stringify({ send_email: true }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return { success: true, ...data };
+  } catch (error) {
+    if (error instanceof Error) return error?.message;
+    return { success: false, error: error };
+  }
+};
 export const setUpDirectDebit = async (data: {
   payment_intent: string;
   given_name: string;

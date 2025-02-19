@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import LinkForm from "./LinkForm";
 import Link from "next/link";
+import PayLinks from "./PayLinks";
 
 function page() {
   return (
@@ -12,7 +13,10 @@ function page() {
           Home
         </Link>
       </Button>
-      <LinkForm />
+      <div className="flex flex-col justify-between w-full">
+        <LinkForm />
+        <PayLinks />
+      </div>
     </div>
   );
 }
