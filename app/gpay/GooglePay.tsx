@@ -16,12 +16,11 @@ import {
   makePaymentGpay,
 } from "@/lib/actions/blink";
 
-import { Fragment, useEffect, useRef, useState } from "react";
-import Head from "next/head";
+import { useEffect, useRef, useState } from "react";
 import PaymentForm from "./PaymentForm";
 
 function GooglePay() {
-  const [data, setData] = useState<null | any>(null);
+  const [data, setData] = useState<unknown | null>(null);
   const [amount, setAmount] = useState(0);
   const [type, setType] = useState("SALE");
   const [layout, setLayout] = useState("basic");
@@ -36,7 +35,7 @@ function GooglePay() {
     }
     if (!data) initiatePaymentProcess();
   }, [data]);
-  function handleSubmit(e) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(paymentFormRef.current);
     const formDataObject = Object.fromEntries(formData.entries());

@@ -1,10 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { PaymentData } from "../types";
-import { redirect } from "next/dist/server/api-utils";
-import { param } from "jquery";
-import { access } from "fs";
 
 const URL = process.env.BLINK_API_URL;
 const API_KEY = process.env.BLINK_API_KEY;

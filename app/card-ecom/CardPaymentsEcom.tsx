@@ -12,7 +12,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { createIntent, generateToken } from "@/lib/actions/blink";
 
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PaymentForm from "./PaymentForm";
 import { PaymentIntentResponse } from "@/lib/types";
 

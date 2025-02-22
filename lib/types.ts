@@ -40,3 +40,11 @@ export type PaymentData = {
   customer_postcode: string;
   transaction_unique: string;
 };
+
+export interface PayLink {
+  id: string;
+  paylink_url: string;
+  status: string;
+  created_by: string;
+  amount: number;
+}

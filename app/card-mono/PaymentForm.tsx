@@ -23,6 +23,7 @@ function PaymentForm({
     const form: HTMLFormElement | null = document.querySelector("#payment");
     if (!form) return;
     //Create hostedForm instance
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const hostedForm: any = $(form).hostedForm("instance");
     try {
       const response = await hostedForm.getPaymentDetails();

@@ -4,11 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createIntent, generateToken, makeOBReq } from "@/lib/actions/blink";
-
 import { useEffect, useState } from "react";
-
 import { PaymentIntentResponse } from "@/lib/types";
-import { useRouter } from "next/navigation";
 
 function OpenBanking() {
   const [accessToken, setAccessToken] = useState(null);
@@ -19,7 +16,6 @@ function OpenBanking() {
   const [amount, setAmount] = useState(0);
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerName, setCustomerName] = useState<string>("");
-  const router = useRouter();
 
   useEffect(() => {
     async function initiatePaymentProcess() {

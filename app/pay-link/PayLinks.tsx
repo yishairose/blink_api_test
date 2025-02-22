@@ -17,11 +17,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { PayLink } from "@/lib/types";
 
 function PayLinks() {
   const [accessToken, setAccessToken] = useState(null);
   const [errors, setErrors] = useState<Error | null>(null);
-  const [payLinks, setPayLinks] = useState(null);
+
+  const [payLinks, setPayLinks] = useState<PayLink[]>([]);
   useEffect(() => {
     async function initiatePaymentProcess() {
       try {
@@ -31,11 +33,11 @@ function PayLinks() {
         setAccessToken(data.access_token);
       } catch (error) {
         setErrors(error as Error);
-        console.log(error);
+        console.log(errors);
       }
     }
     if (!accessToken) initiatePaymentProcess();
-  }, [accessToken]);
+  }, [accessToken, errors]);
 
   useEffect(() => {
     (async () => {
@@ -43,7 +45,10 @@ function PayLinks() {
       try {
         const res = await getAllPayLinks(accessToken);
         if (res.data.length > 0) setPayLinks(res.data);
-      } catch (error) {}
+      } catch (error) {
+        setErrors(error as Error);
+        console.log(error);
+      }
     })();
   }, [accessToken]);
   return (

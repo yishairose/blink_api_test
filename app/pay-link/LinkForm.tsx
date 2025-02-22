@@ -31,11 +31,11 @@ function LinkForm() {
         setAccessToken(data.access_token);
       } catch (error) {
         setErrors(error as Error);
-        console.log(error);
+        console.log(errors);
       }
     }
     if (!accessToken) initiatePaymentProcess();
-  }, [accessToken]);
+  }, [accessToken, errors]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

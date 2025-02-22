@@ -98,7 +98,7 @@ export default function TransactionCard({
               } catch (error) {
                 toast({
                   title: "Error",
-                  description: error ? error.message : "Something went wrong",
+                  description: error ? error?.message : "Something went wrong",
                   variant: "destructive",
                   duration: 5000,
                 });

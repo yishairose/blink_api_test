@@ -2,8 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { setUpDirectDebit } from "@/lib/actions/blink";
-import { PaymentIntentResponse } from "@/lib/types";
-
 import { useState } from "react";
 
 function PaymentForm({

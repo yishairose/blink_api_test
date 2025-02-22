@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { makePaymentEcom } from "@/lib/actions/blink";
-
-import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import AcsForm from "./AcsForm";
 import { getDeviceDetails, setUpHostedfields } from "@/lib/hostedFields";
@@ -15,7 +13,6 @@ function PaymentForm({
   accessToken: string;
 }) {
   const [acsForm, setAcsForm] = useState(null);
-  const router = useRouter();
   useEffect(() => {
     //Function being called from hostedFields.ts in lib folder
     //These are the two functions which are necessary to be run when form element is rendered.
@@ -29,6 +26,7 @@ function PaymentForm({
     const form: HTMLFormElement | null = document.querySelector("#payment");
     if (!form) return;
     //Create hostedForm instance
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const hostedForm: any = $(form).hostedForm("instance");
     try {
       //Generate payment token

@@ -2,14 +2,9 @@
 import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  cancelTransaction,
-  generateToken,
-  getTransaction,
-} from "@/lib/actions/blink";
+import { generateToken, getTransaction } from "@/lib/actions/blink";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { Card } from "@/components/ui/card";
+
 import TransactionCard from "./TransactionCard";
 
 function ViewTransaction() {
